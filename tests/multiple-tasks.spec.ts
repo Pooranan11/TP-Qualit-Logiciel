@@ -1,22 +1,20 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { TodoPage } from '../pages/TodoPage';
 
-test('test', async ({ page }) => {
-    await page.goto('https://demo.playwright.dev/todomvc/#/');
-    await page.pause();
-    await page.getByRole('textbox', { name: 'What needs to be done?' }).fill('Acheter du pain');
-    await page.pause();
-    await page.keyboard.press('Enter');
-    await page.pause();
-    await page.getByRole('textbox', { name: 'What needs to be done?' }).fill('Aller courir');
-    await page.pause();
-    await page.keyboard.press('Enter');
-    await page.pause();    
-    await expect(page.getByText('Acheter du pain')).toBeVisible();
-    await expect(page.getByText('Aller courir')).toBeVisible();
-    await page.pause();
-    await page.getByRole('listitem').filter({ hasText: 'Acheter du pain' }).getByLabel('Toggle Todo').check();
-    await page.pause();    
-    await expect(page.getByText('Acheter du pain')).toBeVisible();
-    await expect(page.getByText('Aller courir')).toBeVisible();
-    await page.pause();
+test('ajouter plusieurs tâches et en compléter une seule', async ({ page }) => {
+  const todoPage = new TodoPage(page);
+  await todoPage.goto();
+
+  const tasks = ['Acheter du lait', 'Sortir le chien', 'Coder un test Playwright'];
+
+  for (const task of tasks) {
+    await todoPage.addTask(task);
+    await todoPage.isTaskVisible(task);
+  }
+
+  const taskToComplete = 'Sortir le chien';
+  await todoPage.completeTask(taskToComplete);
+  await todoPage.isTaskCompleted(taskToComplete);
+
+  await page.pause();
 });
